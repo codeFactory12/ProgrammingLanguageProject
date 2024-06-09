@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Tokenizer.Scanner
   other-modules:
       Paths_ProgrammingLanguageProject
   autogen-modules:

@@ -1,0 +1,85 @@
+// Programa de ejemplo que utiliza todos los elementos del BNF
+@init
+
+// Comentario de una linea
+// Este es un comentario de una sola linea
+
+/* 
+   Comentario de varias lineas 
+   Este programa realiza varias operaciones 
+   sobre un conjunto de datos cargados desde un archivo CSV 
+*/
+
+// Cargar los datos desde un archivo CSV
+load "datos.csv" as data;
+
+// Seleccionar columnas especificas
+data.select(nombre, edad, salario);
+
+// Filtrar filas basadas en una condición
+data.filter(edad > 30);
+
+// Agrupar los datos por una columna
+data.group_by(departamento);
+
+// Guardar los datos procesados en un nuevo archivo CSV
+data.save("datos_procesados.csv");
+
+// Asignación de variables
+let int resultado = 0;
+let bool flag = true;
+let string mensaje = "Proceso completado";
+
+// Definición de una función para calcular algo
+function calcular(a, b) {
+    let int suma = a + b;
+    return suma;
+}
+
+// Definición de otra función para aplicar a los datos
+function procesarData(data) {
+    data = data.filter(salario > 50000);
+    data = data.group_by(departamento);
+    data.save("datos_filtrados.csv");
+}
+
+// Llamada a la función procesarData
+procesarData(data);
+
+// Llamada a la función calcular y asignación del resultado
+let int resultado = calcular(10, 20);
+
+// Declaración de un bucle while
+while (flag) {
+    resultado = resultado + 1;
+    if (resultado > 10) {
+        flag = false;
+    }
+}
+
+// Sentencia if-else
+if (resultado == 11) {
+    print("El resultado es 11");
+} else {
+    print("El resultado no es 11");
+}
+
+// Uso de una coincidencia de patrones
+match resultado {
+    case 11 => {
+        print("El resultado coincide con 11");
+    }
+    case 20 => {
+        print("El resultado coincide con 20");
+    }
+    case _ => {
+        print("El resultado no coincide con ningún caso");
+    }
+}
+
+// Imprimir un mensaje final
+print(mensaje);
+
+@end
+1/0
+1*2
