@@ -1,0 +1,82 @@
+@init
+
+// Single-line comment
+// This is a single-line comment
+
+/* 
+   Multi-line comment 
+   This program performs various operations 
+   on a dataset loaded from a CSV file 
+*/
+
+// Load the data from a CSV file
+load "data.csv" as data;
+
+// Select specific columns
+data.select(name, age, salary);
+
+// Filter rows based on a condition
+data.filter(age > 30);
+
+// Group the data by a column
+data.group_by(department);
+
+// Save the processed data to a new CSV file
+data.save("processed_data.csv");
+
+// Variable assignment
+let int result = 0;
+let bool flag = true;
+let string message = "Process completed";
+
+// Function definition to calculate something
+function calculate(a, b) {
+    let int sum = a + b;
+    return sum;
+}
+
+// Function definition to apply to the data
+function processData(data) {
+    data = data.filter(salary > 50000);
+    data = data.group_by(department);
+    data.save("filtered_data.csv");
+}
+
+// Call the processData function
+processData(data);
+
+// Call the calculate function and assign the result
+let int result = calculate(10, 20);
+
+// Declaration of a while loop
+while (flag) {
+    result = result + 1;
+    if (result > 10) {
+        flag = false;
+    }
+}
+
+// If-else statement
+if (result == 11) {
+    print("The result is 11");
+} else {
+    print("The result is not 11");
+}
+
+// Use of pattern matching
+match result {
+    case 11 => {
+        print("The result matches 11");
+    }
+    case 20 => {
+        print("The result matches 20");
+    }
+    otherwise => {
+        print("The result does not match any case");
+    }
+}
+
+// Print a final message
+print(message);
+
+@end
