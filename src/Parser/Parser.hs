@@ -36,7 +36,6 @@ whiteSpace = Token.whiteSpace lexer
 comma = Token.comma lexer
 reservedLet = reserved "let"
 
--- Parsers de Type y Expression
 typeParser :: Parser Type
 typeParser = (reserved "int" >> return TypeInt)
          <|> (reserved "bool" >> return TypeBool)
@@ -52,7 +51,6 @@ term = (Number <$> integer)
 expression :: Parser Expression
 expression = Term <$> term
 
--- Parsers de Statement
 assignment :: Parser Statement
 assignment = do
   reservedLet
