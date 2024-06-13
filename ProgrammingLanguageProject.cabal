@@ -25,7 +25,9 @@ source-repository head
 
 library
   exposed-modules:
+      Grammar.Grammar
       Lib
+      Parser.Parser
   other-modules:
       Paths_ProgrammingLanguageProject
   autogen-modules:
