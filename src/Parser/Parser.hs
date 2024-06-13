@@ -57,7 +57,9 @@ assignment = do
   typ <- typeParser
   name <- identifier
   reservedOp "="
-  Assignment typ name <$> expression
+  expr <- expression
+  semi
+  return $ Assignment typ name expr
 
 parseProgram :: Parser Program
 parseProgram = whiteSpace *> (Program <$> many assignment) <* eof
