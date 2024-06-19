@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use newtype instead of data" #-}
 module Grammar.Grammar where
 
 data Program = Program [Statement] 
@@ -48,7 +50,8 @@ data Relational = Equal | NotEqual | LessThan | GreaterThan | LessThanOrEqual | 
 data Identifier = Identifier String 
   deriving (Show)
 
-data PatternCase = PatternCase Pattern [Statement] 
+data PatternCase = PatternCase Pattern [Statement]
+                 | OtherwiseCase [Statement]
   deriving (Show)
 
 data Pattern = PatNumber Integer | PatString String 
