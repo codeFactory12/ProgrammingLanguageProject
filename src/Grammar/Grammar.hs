@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use newtype instead of data" #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Grammar.Grammar where
 
 data Program = Program [Statement] 
@@ -26,6 +25,9 @@ data Type = TypeInt | TypeString | TypeBool
 
 data Expression = Term Term
                 | BinaryOp Operator Expression Expression
+                | Filter Identifier Expression
+                | Group Identifier [Identifier]
+                | FunctCall Identifier [Expression]
                 deriving (Show)
 
 data Term = Number Integer
