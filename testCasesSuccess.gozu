@@ -1,0 +1,61 @@
+@init
+
+// Simple Assignment and Print Statement
+let int x = 10;
+print(x);
+
+// Boolean Assignment
+let bool flag = true;
+
+// Conditional Statement with Comparison
+let int x = 10;
+if (x > 5) {
+    print("x is greater than 5");
+} else {
+    print("x is not greater than 5");
+}
+
+// Function Definition and Call
+function add(a, b) {
+    let int sum = a + b;
+    return sum;
+}
+let int result = add(5, 10);
+print(result);
+
+// Load and process data
+load "data.csv" as data;
+data.select(name, age, salary);
+data.filter(age > 30);
+data.group_by(department);
+data.save("processed_data.csv");
+
+// Function to process data
+function processData(data) {
+    data = data.filter(salary > 50000);
+    data = data.group_by(department);
+    data.save("filtered_data.csv");
+}
+processData(data);
+
+// Pattern Matching 
+let int result = 10;
+let bool flag = true;
+while (flag) {
+    result = result + 1;
+    if (result > 15) {
+        flag = false;
+    }
+}
+
+// Loop
+match result {
+    case 16 => {
+        print("Result is 16");
+    }
+    otherwise => {
+        print("Result is not 16");
+    }
+}
+
+@end

@@ -1,0 +1,31 @@
+@init
+
+// Missing Semicolon
+let int x = 10
+print(x);
+
+// Invalid Keyword Usage
+assign int x = 10;
+
+
+// Incorrect Function Call Syntax
+function add(a, b) {
+    let int sum = a + b;
+    return sum;
+}
+let int result = add 5, 10;
+print(result);
+
+//  Unmatched Braces
+let int result = 10;
+if (result == 10) {
+    print("Result is 10");
+else {
+
+// Invalid Data Operation
+load "data.csv" as data;
+data.sort_by(age);
+    print("Result is not 10");
+}
+
+@end
