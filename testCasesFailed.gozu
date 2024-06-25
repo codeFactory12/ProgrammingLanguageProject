@@ -1,12 +1,37 @@
 @init
 
+// "and" operator does not exist
+data.filter(age > 30 and salary > 50000);
+
+// falta de comillas alrededor del nombre del archivo
+load data.csv as data; 
+
+// falta de paréntesis en la condición
+data.filter age > 30; 
+
+// falta el operador '&&'
+data.filter(age > 30 salary > 50000); 
+
+// el resultado del filtro no se puede asignar directamente a una variable
+let filteredData = data.filter(age > 30); 
+filteredData.save("filtered_data.csv");
+
+// Filter using a custom function
+let int ageLimit = 20;
+
+function filterByAge(data, ageLimit) {
+    data.filter(age > ageLimit);
+}
+
+filterByAge(data, 30);
+data.save("filtered_data.csv");
+
 // Missing Semicolon
 let int x = 10
 print(x);
 
 // Invalid Keyword Usage
 assign int x = 10;
-
 
 // Incorrect Function Call Syntax
 function add(a, b) {
@@ -27,5 +52,112 @@ load "data.csv" as data;
 data.sort_by(age);
     print("Result is not 10");
 }
+
+// Tipo de dato incorrecto
+let int value = "ten"; 
+
+// Uso de variable no inicializada
+let int value;
+print(value); 
+
+// Faltan argumentos
+function subtract(x, y) {
+    return x - y;
+}
+
+// Conflicto de nombres
+let int result = subtract(10); 
+
+let int add = 10;
+
+function add(x, y) { 
+    return x + y;
+}
+
+// Tipo de retorno incorrecto
+function divide(a, b) {
+    let int result = a / b;
+    return "result"; 
+}
+
+let int quotient = divide(10, 2);
+
+// Tipo de parámetro incorrecto
+function doubleNumber(x) {
+    return x * 2;
+}
+
+let int result = doubleNumber("ten"); 
+
+// Uso de palabra clave reservada
+let int function = 5; 
+
+// Falta de declaración del tipo de retorno en la función
+function greet(name) { 
+    return "Hello, " + name;
+}
+
+// Error en la condición del loop
+let int count = 0;
+
+while {count < 10 
+    count = count + 1;
+}
+
+// Error en la sintaxis del if-else
+let int value = 5;
+
+if value == 5 { 
+    print("Value is 5");
+} else {
+    print("Value is not 5");
+}
+
+// Error en la sintaxis del if-else
+let int value = 5;
+
+else value == 5 { 
+    print("Value is 5");
+} if {
+    print("Value is not 5");
+}
+
+// Pattern matching sin caso por defecto
+match score {
+    case 90 => {
+        print("Score is 90");
+    }
+    case 80 => {
+        print("Score is 80");
+    } 
+}
+
+// Condicional sin cuerpo
+let int number = 3;
+
+if (number > 0) 
+else {
+    print("Number is non-positive");
+}
+
+// Loop con break y continue usando while
+let int sum = 0;
+let int i = 0;
+
+while (i < 10) {
+    i = i + 1;
+    
+    if (i * 2 == 0) {
+        continue;
+    }
+    
+    if (i == 7) {
+        break;
+    }
+    
+    sum = sum + i;
+}
+
+print(sum);
 
 @end

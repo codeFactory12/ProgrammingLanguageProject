@@ -15,3 +15,4 @@ someFunc = do
     case parse parseProgram "" input of
         Left err -> print err
         Right prog -> print prog
+        
