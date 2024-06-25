@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      GeneratorCode.GeneratorCode
       Grammar.Grammar
       Lib
       Parser.Parser
