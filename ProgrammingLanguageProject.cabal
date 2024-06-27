@@ -28,6 +28,7 @@ library
       Grammar.Grammar
       Lib
       Parser.Parser
+      SymbolTable.SymbolTable
   other-modules:
       Paths_ProgrammingLanguageProject
   autogen-modules:
@@ -37,6 +38,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , containers
     , parsec
   default-language: Haskell2010
 
@@ -52,6 +54,7 @@ executable ProgrammingLanguageProject-exe
   build-depends:
       ProgrammingLanguageProject
     , base >=4.7 && <5
+    , containers
     , parsec
   default-language: Haskell2010
 
@@ -68,5 +71,6 @@ test-suite ProgrammingLanguageProject-test
   build-depends:
       ProgrammingLanguageProject
     , base >=4.7 && <5
+    , containers
     , parsec
   default-language: Haskell2010
