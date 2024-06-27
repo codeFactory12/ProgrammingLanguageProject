@@ -1,0 +1,117 @@
+@init
+
+// Load and process data
+load "data.csv" as data;
+
+// Filter by a single condition
+data.filter(age > 30);
+
+// Filter by multiple conditions
+data.filter(age > 30 && salary > 50000);
+
+// Select columns
+data.select(name, age, department);
+
+// Group
+data.group_by(department);
+
+// Use of variables in the filter
+let int yearLimit = 2020;
+data.filter(year > yearLimit);
+
+// Save processed data
+data.save("processed_data.csv");
+
+// Declaración y asignación de variables
+let int num1 = 10;
+let int num2 = 20;
+let string greeting = "Hello, world!";
+let bool isActive = true;
+
+print(num1);
+print(num2);
+print(greeting);
+print(isActive);
+
+// Funciones con diferentes tipos de parámetros
+function concatenate(str1, str2) {
+    let string result = str1 + " " + str2;
+    return result;
+}
+
+let string combined = concatenate("Hello", "there!");
+print(combined);
+
+// Función que retorna un valor booleano
+function isEven(number) {
+    return number + 2 == 0;
+}
+
+let bool check = isEven(4);
+print(check); 
+
+// Función con parámetros y variables locales
+function multiply(a, b) {
+    let int product = a * b;
+    return product;
+}
+
+let int result = multiply(3, 7);
+print(result); 
+
+// Funciones anidadas
+function outerFunction(x) {
+    function innerFunction(y) {
+        return y * y;
+    }
+    return innerFunction(x) + x;
+}
+
+let int output = outerFunction(5);
+print(output); 
+
+// Loop con condicional dentro
+let int counter = 0;
+let bool keepGoing = true;
+
+while (keepGoing) {
+    counter = counter + 1;
+    if (counter >= 10) {
+        keepGoing = false;
+    }
+}
+
+print(counter);
+
+// Condicionales anidados
+let int num = 7;
+
+if (num > 0) {
+    if (num + 2 == 0) {
+        print("Positive even number");
+    } else {
+        print("Positive odd number");
+    }
+} else {
+    print("Non-positive number");
+}
+
+// Pattern matching con múltiples casos
+let int status = 2;
+
+match status {
+    case 1 => {
+        print("Status is 1");
+    }
+    case 2 => {
+        print("Status is 2");
+    }
+    case 3 => {
+        print("Status is 3");
+    }
+    otherwise => {
+        print("Unknown status");
+    }
+}
+
+@end
