@@ -11,6 +11,7 @@ someFunc = do
     -- testCasesSuccess.gozu
     -- testCasesFailed.gozu
     -- program.gozu
+
     input <- readFile "program.gozu"
     case parse parseProgram "" input of
         Left err -> print err
