@@ -20,7 +20,7 @@ data Statement = Assignment Type Identifier Expression
                | Comment String
                deriving (Show)
 
-data Type = TypeInt | TypeString | TypeBool 
+data Type = TypeInt | TypeString | TypeBool | TypeData
   deriving (Show)
 
 data Expression = Term Term
