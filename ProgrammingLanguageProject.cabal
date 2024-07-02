@@ -28,6 +28,7 @@ library
       Grammar.Grammar
       Lib
       Parser.Parser
+      SemanticAnalyzer.SemanticAnalyzer
       SymbolTable.SymbolTable
   other-modules:
       Paths_ProgrammingLanguageProject
@@ -39,6 +40,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , mtl
     , parsec
   default-language: Haskell2010
 
@@ -55,6 +57,7 @@ executable ProgrammingLanguageProject-exe
       ProgrammingLanguageProject
     , base >=4.7 && <5
     , containers
+    , mtl
     , parsec
   default-language: Haskell2010
 
@@ -72,5 +75,6 @@ test-suite ProgrammingLanguageProject-test
       ProgrammingLanguageProject
     , base >=4.7 && <5
     , containers
+    , mtl
     , parsec
   default-language: Haskell2010
