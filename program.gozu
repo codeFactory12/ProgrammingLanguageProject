@@ -9,21 +9,6 @@
    on a dataset loaded from a CSV file 
 */
 
-// Load the data from a CSV file
-load "data.csv" as data;
-
-// Select specific columns
-data.select(name, age, salary);
-
-// Filter rows based on a condition
-data.filter(age > 30);
-
-// Group the data by a column
-data.group_by(department);
-
-// Save the processed data to a new CSV file
-data.save("processed_data.csv");
-
 // Variable assignment
 let int result = 0;
 let bool flag = true;

@@ -4,6 +4,10 @@ module Lib
 
 import Parser.Parser (parseProgram)
 import Text.Parsec
+import qualified Grammar.Grammar as AST
+import qualified SymbolTable.SymbolTable as ST
+import qualified SemanticAnalyzer.SemanticAnalyzer as SA
+import qualified Data.Map as Map
 
 someFunc :: IO ()
 someFunc = do
@@ -15,5 +19,9 @@ someFunc = do
     input <- readFile "program.gozu"
     case parse parseProgram "" input of
         Left err -> print err
-        Right prog -> print prog
+        Right prog -> do
+            let initialSymbolTable = ST.populateSymbolTable [] Map.empty
+            let finalSymbolTable = SA.analyzeProgram prog initialSymbolTable
+            putStrLn "Symbol Table after Semantic Analysis:"
+            mapM_ print (Map.toList finalSymbolTable)
         
