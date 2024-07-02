@@ -7,15 +7,12 @@ module SemanticAnalyzer.SemanticAnalyzer (
 import qualified SymbolTable.SymbolTable as ST
 import qualified Grammar.Grammar as AST
 
--- Main function to analyze the entire program
 analyzeProgram :: AST.Program -> ST.SymbolTable -> ST.SymbolTable
 analyzeProgram (AST.Program stmts) symTable = analyzeStatements stmts symTable
 
--- Analyze a list of statements
 analyzeStatements :: [AST.Statement] -> ST.SymbolTable -> ST.SymbolTable
 analyzeStatements stmts symTable = foldl (flip analyzeStatement) symTable stmts
 
--- Analyze a single statement
 analyzeStatement :: AST.Statement -> ST.SymbolTable -> ST.SymbolTable
 analyzeStatement stmt symTable =
     case stmt of
@@ -74,7 +71,6 @@ analyzeStatement stmt symTable =
 
         AST.PatternMatch ident cases -> symTable
 
--- Analyze an expression
 analyzeExpression :: AST.Expression -> ST.SymbolTable -> ST.SymbolTable
 analyzeExpression expr symTable =
     case expr of
@@ -88,9 +84,8 @@ analyzeExpression expr symTable =
                 Just _  -> analyzeExpression innerExpr symTable
                 Nothing -> error $ "Variable not in scope: " ++ name
         AST.Group ident cols -> symTable
-        AST.FunctCall ident args -> symTable -- Add function call analysis if needed
+        AST.FunctCall ident args -> symTable
 
--- Analyze a term
 analyzeTerm :: AST.Term -> ST.SymbolTable -> ST.SymbolTable
 analyzeTerm term symTable =
     case term of
@@ -104,7 +99,6 @@ analyzeTerm term symTable =
         AST.Str _ -> symTable
         AST.Expr expr -> analyzeExpression expr symTable
 
--- Validate if columns are in the dataset
 validateColumns :: AST.Identifier -> [AST.Identifier] -> ST.SymbolTable -> ST.SymbolTable
 validateColumns dataIdent columns symTable =
     let dataName = ST.nameFromIdentifier dataIdent
@@ -113,8 +107,7 @@ validateColumns dataIdent columns symTable =
             foldl (\tbl col -> validateColumn col tbl) symTable columns
         _ -> error $ "Data identifier not in scope: " ++ dataName
 
--- Validate if a single column is in the dataset
 validateColumn :: AST.Identifier -> ST.SymbolTable -> ST.SymbolTable
 validateColumn col symTable =
     let colName = ST.nameFromIdentifier col
-    in symTable -- Here you could add logic to check columns if you have such metadata
+    in symTable 
