@@ -57,13 +57,13 @@ analyzeStatement stmt symTable =
                 sym = ST.Symbol name ST.DATA ST.GLOBAL True
             in ST.insertSymbol name sym symTable
 
-        AST.SelectColumns ident cols -> validateColumns ident cols symTable
+        AST.SelectColumns ident _ -> verifyIdentifier ident symTable
 
-        AST.FilterRows ident expr -> analyzeExpression expr symTable
+        AST.FilterRows ident _ -> verifyIdentifier ident symTable
 
-        AST.GroupBy ident cols -> validateColumns ident cols symTable
+        AST.GroupBy ident _ ->  verifyIdentifier ident symTable
 
-        AST.SaveData ident _ -> symTable
+        AST.SaveData ident _ -> verifyIdentifier ident symTable
 
         AST.ApplyFunctions ident funcCall -> symTable
 
@@ -78,13 +78,9 @@ analyzeExpression expr symTable =
         AST.BinaryOp _ left right ->
             let symTable' = analyzeExpression left symTable
             in analyzeExpression right symTable'
-        AST.Filter ident innerExpr ->
-            let name = ST.nameFromIdentifier ident
-            in case ST.lookupSymbol name symTable of
-                Just _  -> analyzeExpression innerExpr symTable
-                Nothing -> error $ "Variable not in scope: " ++ name
-        AST.Group ident cols -> symTable
-        AST.FunctCall ident args -> symTable
+        AST.Filter _ _ -> symTable
+        AST.Group _ _ -> symTable
+        AST.FunctCall _ _ -> symTable
 
 analyzeTerm :: AST.Term -> ST.SymbolTable -> ST.SymbolTable
 analyzeTerm term symTable =
@@ -99,15 +95,7 @@ analyzeTerm term symTable =
         AST.Str _ -> symTable
         AST.Expr expr -> analyzeExpression expr symTable
 
-validateColumns :: AST.Identifier -> [AST.Identifier] -> ST.SymbolTable -> ST.SymbolTable
-validateColumns dataIdent columns symTable =
-    let dataName = ST.nameFromIdentifier dataIdent
-    in case ST.lookupSymbol dataName symTable of
-        Just (ST.Symbol _ ST.DATA _ _) ->
-            foldl (\tbl col -> validateColumn col tbl) symTable columns
-        _ -> error $ "Data identifier not in scope: " ++ dataName
-
-validateColumn :: AST.Identifier -> ST.SymbolTable -> ST.SymbolTable
-validateColumn col symTable =
-    let colName = ST.nameFromIdentifier col
-    in symTable 
+verifyIdentifier :: AST.Identifier -> ST.SymbolTable -> ST.SymbolTable
+verifyIdentifier ident symTable = if ST.symbolExists (ST.nameFromIdentifier ident) symTable
+    then symTable
+    else error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident

@@ -32,7 +32,9 @@ data Symbol = Symbol
   deriving (Show, Eq)
 
 insertSymbol :: String -> Symbol -> SymbolTable -> SymbolTable
-insertSymbol name symbol symbolTable = Map.insert name symbol symbolTable
+insertSymbol name symbol symbolTable = if symbolExists name symbolTable
+                     then symbolTable
+                     else Map.insert name symbol symbolTable
 
 lookupSymbol :: String -> SymbolTable -> Maybe Symbol
 lookupSymbol name table = Map.lookup name table
