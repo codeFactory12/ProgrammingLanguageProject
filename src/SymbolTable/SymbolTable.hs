@@ -11,6 +11,7 @@ module SymbolTable.SymbolTable
     BuiltInType (..),
     builtInTypeFromType,
     nameFromIdentifier,
+    getSymbolType,
   )
 where
 
@@ -32,7 +33,9 @@ data Symbol = Symbol
   deriving (Show, Eq)
 
 insertSymbol :: String -> Symbol -> SymbolTable -> SymbolTable
-insertSymbol name symbol symbolTable = Map.insert name symbol symbolTable
+insertSymbol name symbol symbolTable = if symbolExists name symbolTable
+                     then symbolTable
+                     else Map.insert name symbol symbolTable
 
 lookupSymbol :: String -> SymbolTable -> Maybe Symbol
 lookupSymbol name table = Map.lookup name table
@@ -54,6 +57,9 @@ builtInTypeFromType AST.TypeData = DATA
 
 nameFromIdentifier :: AST.Identifier -> String
 nameFromIdentifier (AST.Identifier s) = s
+
+getSymbolType :: Symbol -> BuiltInType
+getSymbolType (Symbol _ t _ _) = t
 
 populateSymbolTable :: [AST.Statement] -> SymbolTable -> SymbolTable
 populateSymbolTable stmts table = foldl processStatement table stmts
