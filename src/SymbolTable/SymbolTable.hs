@@ -11,6 +11,7 @@ module SymbolTable.SymbolTable
     BuiltInType (..),
     builtInTypeFromType,
     nameFromIdentifier,
+    getSymbolType,
   )
 where
 
@@ -56,6 +57,9 @@ builtInTypeFromType AST.TypeData = DATA
 
 nameFromIdentifier :: AST.Identifier -> String
 nameFromIdentifier (AST.Identifier s) = s
+
+getSymbolType :: Symbol -> BuiltInType
+getSymbolType (Symbol _ t _ _) = t
 
 populateSymbolTable :: [AST.Statement] -> SymbolTable -> SymbolTable
 populateSymbolTable stmts table = foldl processStatement table stmts

@@ -4,7 +4,6 @@ module Lib
 
 import Parser.Parser (parseProgram)
 import Text.Parsec
-import qualified Grammar.Grammar as AST
 import qualified SymbolTable.SymbolTable as ST
 import qualified SemanticAnalyzer.SemanticAnalyzer as SA
 import qualified Data.Map as Map

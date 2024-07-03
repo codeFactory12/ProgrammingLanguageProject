@@ -57,13 +57,37 @@ analyzeStatement stmt symTable =
                 sym = ST.Symbol name ST.DATA ST.GLOBAL True
             in ST.insertSymbol name sym symTable
 
-        AST.SelectColumns ident _ -> verifyIdentifier ident symTable
+        AST.SelectColumns ident _ ->
+            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
+            Just symbol ->
+                if ST.getSymbolType symbol /= ST.DATA
+                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
+                else symTable
+            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
 
-        AST.FilterRows ident _ -> verifyIdentifier ident symTable
+        AST.FilterRows ident _ -> 
+            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
+            Just symbol ->
+                if ST.getSymbolType symbol /= ST.DATA
+                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
+                else symTable
+            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
 
-        AST.GroupBy ident _ ->  verifyIdentifier ident symTable
+        AST.GroupBy ident _ ->  
+            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
+            Just symbol ->
+                if ST.getSymbolType symbol /= ST.DATA
+                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
+                else symTable
+            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
 
-        AST.SaveData ident _ -> verifyIdentifier ident symTable
+        AST.SaveData ident _ -> 
+            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
+            Just symbol ->
+                if ST.getSymbolType symbol /= ST.DATA
+                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
+                else symTable
+            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
 
         AST.ApplyFunctions ident funcCall -> symTable
 
@@ -94,8 +118,3 @@ analyzeTerm term symTable =
         AST.Boolean _ -> symTable
         AST.Str _ -> symTable
         AST.Expr expr -> analyzeExpression expr symTable
-
-verifyIdentifier :: AST.Identifier -> ST.SymbolTable -> ST.SymbolTable
-verifyIdentifier ident symTable = if ST.symbolExists (ST.nameFromIdentifier ident) symTable
-    then symTable
-    else error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
