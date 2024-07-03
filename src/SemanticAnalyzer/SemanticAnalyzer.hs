@@ -57,37 +57,13 @@ analyzeStatement stmt symTable =
                 sym = ST.Symbol name ST.DATA ST.GLOBAL True
             in ST.insertSymbol name sym symTable
 
-        AST.SelectColumns ident _ ->
-            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
-            Just symbol ->
-                if ST.getSymbolType symbol /= ST.DATA
-                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
-                else symTable
-            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
+        AST.SelectColumns ident _ -> validateDataType ident symTable
 
-        AST.FilterRows ident _ -> 
-            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
-            Just symbol ->
-                if ST.getSymbolType symbol /= ST.DATA
-                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
-                else symTable
-            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
+        AST.FilterRows ident _ -> validateDataType ident symTable
 
-        AST.GroupBy ident _ ->  
-            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
-            Just symbol ->
-                if ST.getSymbolType symbol /= ST.DATA
-                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
-                else symTable
-            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
+        AST.GroupBy ident _ ->  validateDataType ident symTable
 
-        AST.SaveData ident _ -> 
-            case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
-            Just symbol ->
-                if ST.getSymbolType symbol /= ST.DATA
-                then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
-                else symTable
-            Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
+        AST.SaveData ident _ -> validateDataType ident symTable
 
         AST.ApplyFunctions ident funcCall -> symTable
 
@@ -102,8 +78,8 @@ analyzeExpression expr symTable =
         AST.BinaryOp _ left right ->
             let symTable' = analyzeExpression left symTable
             in analyzeExpression right symTable'
-        AST.Filter _ _ -> symTable
-        AST.Group _ _ -> symTable
+        AST.Filter ident _ -> validateDataType ident symTable
+        AST.Group ident _ -> validateDataType ident symTable
         AST.FunctCall _ _ -> symTable
 
 analyzeTerm :: AST.Term -> ST.SymbolTable -> ST.SymbolTable
@@ -118,3 +94,12 @@ analyzeTerm term symTable =
         AST.Boolean _ -> symTable
         AST.Str _ -> symTable
         AST.Expr expr -> analyzeExpression expr symTable
+
+validateDataType :: AST.Identifier -> ST.SymbolTable -> ST.SymbolTable
+validateDataType ident symTable =
+    case ST.lookupSymbol (ST.nameFromIdentifier ident) symTable of
+        Just symbol ->
+            if ST.getSymbolType symbol /= ST.DATA
+            then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
+            else symTable
+        Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
