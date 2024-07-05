@@ -5,9 +5,9 @@ data = pd.read_csv("data.csv")
 data = data[["name", "age", "salary", "department"]]
 
 data = data[data["age"]> 30]
-data = data.groupby(["age"]).mean(numeric_only=True)
+data = data[["name"]]
 
-data.to_csv("processed_data.csv", index=False)
+data.to_csv("names_filtered.csv", index=False)
 
 result = 0
 flag = True
@@ -18,9 +18,10 @@ def calculate(a, b):
     return sum
 
 def processData(data):
-    data = data[data["salary"]> 50000]
-    data = data.groupby(["department"]).count()
-    data.to_csv("filtered_data.csv", index=False)
+    datafunc = pd.read_csv("data.csv")
+    datafunc = datafunc[datafunc["salary"]> 50000]
+    datafunc = datafunc.groupby(["salary"]).sum()
+    datafunc.to_csv("filtered_salary.csv", index=False)
 
 processData(data)
 result = calculate(10, 20)
