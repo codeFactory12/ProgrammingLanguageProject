@@ -19,10 +19,10 @@ data.select(name, age, salary,department);
 data.filter(age > 30);
 
 // Group the data by a column
-data.group_by(age).mean;
+data.select(name);
 
 // Save the processed data to a new CSV file
-data.save("processed_data.csv");
+data.save("names_filtered.csv");
 
 // Variable assignment
 let int result = 0;
@@ -37,9 +37,10 @@ function calculate(a, b) {
 
 // Function definition to apply to the data
 function processData(data) {
-    data = data.filter(salary > 50000);
-    data = data.group_by(department).count;
-    data.save("filtered_data.csv");
+    load "data.csv" as datafunc;
+    datafunc = datafunc.filter(salary > 50000);
+    datafunc = datafunc.group_by(salary).sum;
+    datafunc.save("filtered_salary.csv");
 }
 
 // Call the processData function
