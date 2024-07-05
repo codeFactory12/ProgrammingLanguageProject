@@ -46,7 +46,7 @@ generateStatement (LoadData filePath (Identifier ident)) =
     ident ++ " = pd.read_csv(" ++ show filePath ++ ")\n"
 
 generateStatement (FilterRows (Identifier ident) cond) =
-    ident ++ " = " ++ ident ++ "[" ++ generateExpression cond ++ "]\n"
+    ident ++ " = " ++ ident ++ "[" ++ ident ++ generateFilterExpression cond ++ "]"
 
 generateStatement (SaveData (Identifier ident) filePath) =
     ident ++ ".to_csv(" ++ show filePath ++ ", index=False)\n"
@@ -59,11 +59,13 @@ generateStatement (GroupBy (Identifier ident) cols) =
 
 generateStatement (ApplyFunctions (Identifier ident) (functId, args)) =
     ident ++ " = " ++ ident ++ "." ++ generateFunctionCall (functId, args)
+    
+generateStatement _ = "Unsupported statement"
 
-generateStatement (Comment comment) =
-    "# " ++ comment
-generateStatement _ = ""
 
+generateFilterExpression::Expression -> String
+generateFilterExpression (BinaryOp op left right) =
+   "[" ++ "\"" ++ generateExpression(left) ++ "\"" ++ "]" ++ generateOperator(op) ++ " " ++ generateExpression(right)
 
 generateFunctionCall :: FunctionCall -> String
 generateFunctionCall (Identifier name, args) =
@@ -80,6 +82,7 @@ generateExpression (Filter (Identifier ident) expr) =
 generateExpression (Group (Identifier ident) indetifiers) =
     ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) indetifiers) ++ "])\n"
 generateExpression _ = error "Unhandled expression"
+
 
 generateTerm :: Term -> String
 generateTerm (Number n) = show n
