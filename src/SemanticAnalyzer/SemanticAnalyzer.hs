@@ -65,11 +65,22 @@ analyzeStatement stmt symTable =
 
         AST.SaveData ident _ -> validateDataType ident symTable
 
-        AST.ApplyFunctions ident funcCall -> symTable
+        AST.ApplyFunctions ident funcCall ->
+            let symTable' = validateDataType ident symTable
+            in analyzeStatement (uncurry AST.FunctionCall funcCall) symTable'
 
         AST.Comment _ -> symTable
 
-        AST.PatternMatch ident cases -> symTable
+        AST.PatternMatch ident cases ->
+            let name = ST.nameFromIdentifier ident
+            in case ST.lookupSymbol name symTable of
+                Just symbol ->
+                    let symTable' = analyzePatternCases symbol cases symTable
+                    in symTable'
+                Nothing ->
+                    let sym = ST.Symbol name ST.STRING ST.LOCAL True
+                        symTable' = ST.insertSymbol name sym symTable
+                    in analyzePatternCases sym cases symTable'
 
 analyzeExpression :: AST.Expression -> ST.SymbolTable -> ST.SymbolTable
 analyzeExpression expr symTable =
@@ -103,3 +114,19 @@ validateDataType ident symTable =
             then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
             else symTable
         Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
+
+analyzePatternCases :: ST.Symbol -> [AST.PatternCase] -> ST.SymbolTable -> ST.SymbolTable
+analyzePatternCases symbol cases symTable = foldl (analyzePatternCase symbol) symTable cases
+
+analyzePatternCase :: ST.Symbol -> ST.SymbolTable -> AST.PatternCase -> ST.SymbolTable
+analyzePatternCase symbol symTable (AST.PatternCase pattern stmts) =
+    if validatePattern symbol pattern
+    then analyzeStatements stmts symTable
+    else symTable
+analyzePatternCase _ symTable (AST.OtherwiseCase stmts) = analyzeStatements stmts symTable
+
+validatePattern :: ST.Symbol -> AST.Pattern -> Bool
+validatePattern symbol pattern =
+    case pattern of
+        AST.PatNumber _ -> ST.getSymbolType symbol == ST.INTEGER
+        AST.PatString _ -> ST.getSymbolType symbol == ST.STRING
