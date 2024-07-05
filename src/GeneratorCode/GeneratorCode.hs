@@ -1,4 +1,7 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant bracket" #-}
 module GeneratorCode.GeneratorCode(generateProgram) where
 
 import Grammar.Grammar
@@ -31,7 +34,7 @@ generateStatement (PatternMatch (Identifier ident) cases) =
 
 generateStatement (FunctionDecl (Identifier name) params body ret) =
     lineBreak ++ "def " ++ name ++ "(" ++ paramList ++ "):" ++ lineBreak ++
-    indent (concatMap generateStatement body) ++ 
+    indent (concatMap generateStatement body) ++
     case ret of
         Just expr -> "    return " ++ generateExpression expr
         Nothing -> ""
@@ -41,16 +44,37 @@ generateStatement (FunctionDecl (Identifier name) params body ret) =
 generateStatement (FunctionCall (Identifier name) args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
 
-generateStatement _ = error "Unsupported statement"
+generateStatement (LoadData filePath (Identifier ident)) =
+    ident ++ " = pd.read_csv(" ++ show filePath ++ ")"
+
+generateStatement (FilterRows (Identifier ident) cond) =
+    ident ++ " = " ++ ident ++ "[" ++ ident ++ generateFilterExpression cond ++ "]"
+
+generateStatement (SaveData (Identifier ident) filePath) =
+    ident ++ ".to_csv(" ++ show filePath ++ ", index=False)"
+
+generateStatement (ApplyFunctions (Identifier ident) (functId, args)) =
+    ident ++ " = " ++ ident ++ "." ++ generateFunctionCall (functId, args)
+
+generateStatement _ = "Unsupported statement"
+
+generateFilterExpression::Expression -> String
+generateFilterExpression (BinaryOp op left right) =
+   "[" ++ "\"" ++ generateExpression(left) ++ "\"" ++ "]" ++ generateOperator(op) ++ " " ++ generateExpression(right)
+
+generateFunctionCall :: FunctionCall -> String
+generateFunctionCall (Identifier name, args) =
+    name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
 
 generateExpression :: Expression -> String
-generateExpression (Term term) = generateTerm term
+generateExpression (Term term) = generateTerm(term)
 generateExpression (BinaryOp op left right) =
-    generateExpression left ++ " " ++ generateOperator op ++ " " ++ generateExpression right
+    generateExpression(left) ++ " " ++ generateOperator(op) ++ " " ++ generateExpression(right)
 generateExpression (FunctCall (Identifier name) args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
-generateExpression _ = error "Unhandled expression"
-
+generateExpression (Filter (Identifier ident) expr) =
+    ident ++ "[" ++ generateExpression expr ++ "]"
+generateExpression _ = "Unhandled expression"
 
 generateTerm :: Term -> String
 generateTerm (Number n) = show n
