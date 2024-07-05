@@ -54,8 +54,8 @@ generateStatement (SaveData (Identifier ident) filePath) =
 generateStatement (SelectColumns (Identifier ident) cols) =
     ident ++ " = " ++ ident ++ "[[" ++ intercalate ", " (map (\(Identifier col) -> show col ) cols) ++ "]]\n"
 
-generateStatement (GroupBy (Identifier ident) cols) =
-    ident ++ " = " ++ ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) cols) ++ "])\n"
+generateStatement (GroupBy (Identifier ident) cols funcname) =
+    ident ++ " = " ++ ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) cols) ++ "])." ++ funcnameAnalizer funcname
 
 generateStatement (ApplyFunctions (Identifier ident) (functId, args)) =
     ident ++ " = " ++ ident ++ "." ++ generateFunctionCall (functId, args)
@@ -78,11 +78,13 @@ generateExpression (BinaryOp op left right) =
 generateExpression (FunctCall (Identifier name) args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
 generateExpression (Filter (Identifier ident) expr) =
-    ident ++ "[" ++ generateExpression expr ++ "]\n"
-generateExpression (Group (Identifier ident) indetifiers) =
-    ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) indetifiers) ++ "])\n"
+    ident ++ "[" ++ ident  ++ generateFilterExpression expr ++ "]\n"
+generateExpression (Group (Identifier ident) indetifiers funcname) =
+    ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) indetifiers) ++ "])." ++ funcnameAnalizer funcname
 generateExpression _ = error "Unhandled expression"
 
+funcnameAnalizer :: String -> String
+funcnameAnalizer x = if x == "mean" then "mean(numeric_only=True)\n" else x ++ "()\n"
 
 generateTerm :: Term -> String
 generateTerm (Number n) = show n

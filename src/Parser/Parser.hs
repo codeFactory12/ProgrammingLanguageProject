@@ -223,19 +223,24 @@ filterRowsExpr = do
   expressionData <- parens expression
   return $ Filter identifierData expressionData
 
+groupByFunctions :: [String]
+groupByFunctions = ["mean", "sum", "size", "count", "min", "max", "median", "std", "var"]
+
 groupBy :: Parser Statement
 groupBy = do
   identifierData <- identifier
   char '.' *> reserved "group_by" *> skipMany space
-  columns <- parens (identifier `sepBy` comma) <* semiColon
-  return $ GroupBy identifierData columns
+  columns <- parens (identifier `sepBy` comma)
+  functionName <- char '.' *> choice (map (try . string) groupByFunctions) <* semiColon
+  return $ GroupBy identifierData columns functionName
 
 groupByExpr :: Parser Expression
 groupByExpr = do
   identifierData <- identifier
   char '.' *> reserved "group_by" *> skipMany space
   columns <- parens (identifier `sepBy` comma)
-  return $ Group identifierData columns
+  functionName <- char '.' *> choice (map (try . string) groupByFunctions)
+  return $ Group identifierData columns functionName
 
 saveData :: Parser Statement
 saveData = do

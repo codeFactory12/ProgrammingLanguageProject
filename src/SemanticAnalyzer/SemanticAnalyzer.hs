@@ -61,7 +61,7 @@ analyzeStatement stmt symTable =
 
         AST.FilterRows ident _ -> validateDataType ident symTable
 
-        AST.GroupBy ident _ ->  validateDataType ident symTable
+        AST.GroupBy ident _ _->  validateDataType ident symTable
 
         AST.SaveData ident _ -> validateDataType ident symTable
 
@@ -79,7 +79,7 @@ analyzeExpression expr symTable =
             let symTable' = analyzeExpression left symTable
             in analyzeExpression right symTable'
         AST.Filter ident _ -> validateDataType ident symTable
-        AST.Group ident _ -> validateDataType ident symTable
+        AST.Group ident _ _ -> validateDataType ident symTable
         AST.FunctCall _ _ -> symTable
 
 analyzeTerm :: AST.Term -> ST.SymbolTable -> ST.SymbolTable

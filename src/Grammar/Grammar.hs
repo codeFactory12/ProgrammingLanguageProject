@@ -14,7 +14,7 @@ data Statement = Assignment Type Identifier Expression
                | LoadData String Identifier
                | SelectColumns Identifier [Identifier]
                | FilterRows Identifier Expression
-               | GroupBy Identifier [Identifier]
+               | GroupBy Identifier [Identifier] String
                | SaveData Identifier String
                | ApplyFunctions Identifier FunctionCall
                | Comment String
@@ -26,7 +26,7 @@ data Type = TypeInt | TypeString | TypeBool | TypeData
 data Expression = Term Term
                 | BinaryOp Operator Expression Expression
                 | Filter Identifier Expression
-                | Group Identifier [Identifier]
+                | Group Identifier [Identifier] String
                 | FunctCall Identifier [Expression]
                 deriving (Show)
 
