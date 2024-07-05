@@ -1,4 +1,7 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant bracket" #-}
 module GeneratorCode.GeneratorCode(generateProgram) where
 
 import Grammar.Grammar
@@ -31,7 +34,7 @@ generateStatement (PatternMatch (Identifier ident) cases) =
 
 generateStatement (FunctionDecl (Identifier name) params body ret) =
     lineBreak ++ "def " ++ name ++ "(" ++ paramList ++ "):" ++ lineBreak ++
-    indent (concatMap generateStatement body) ++ 
+    indent (concatMap generateStatement body) ++
     case ret of
         Just expr -> "    return " ++ generateExpression expr
         Nothing -> ""
@@ -41,16 +44,36 @@ generateStatement (FunctionDecl (Identifier name) params body ret) =
 generateStatement (FunctionCall (Identifier name) args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
 
+generateStatement (LoadData filePath (Identifier ident)) =
+    ident ++ " = pd.read_csv(" ++ show filePath ++ ")"
+
+generateStatement (FilterRows (Identifier ident) cond) =
+    ident ++ " = " ++ ident ++ "[" ++ generateExpression cond ++ "]"
+
+generateStatement (SaveData (Identifier ident) filePath) =
+    ident ++ ".to_csv(" ++ show filePath ++ ", index=False)"
+
+generateStatement (ApplyFunctions (Identifier ident) (functId, args)) =
+    ident ++ " = " ++ ident ++ "." ++ generateFunctionCall (functId, args)
+
+generateStatement (Comment comment) =
+    "# " ++ comment
 generateStatement _ = error "Unsupported statement"
 
+
+generateFunctionCall :: FunctionCall -> String
+generateFunctionCall (Identifier name, args) =
+    name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
+
 generateExpression :: Expression -> String
-generateExpression (Term term) = generateTerm term
+generateExpression (Term term) = generateTerm(term)
 generateExpression (BinaryOp op left right) =
-    generateExpression left ++ " " ++ generateOperator op ++ " " ++ generateExpression right
+    generateExpression(left) ++ " " ++ generateOperator(op) ++ " " ++ generateExpression(right)
 generateExpression (FunctCall (Identifier name) args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
+generateExpression (Filter (Identifier ident) expr) =
+    ident ++ "[" ++ generateExpression expr ++ "]"
 generateExpression _ = error "Unhandled expression"
-
 
 generateTerm :: Term -> String
 generateTerm (Number n) = show n

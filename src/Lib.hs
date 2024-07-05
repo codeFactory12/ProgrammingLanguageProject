@@ -16,10 +16,11 @@ someFunc = do
     -- testCasesFailed.gozu
     -- program.gozu
     -- testGeneratorCode.gozu
-    input <- readFile "testGeneratorCode.gozu"
+    input <- readFile "program.gozu"
     case parse parseProgram "" input of
         Left err -> print err
         Right prog -> do
+            print(prog)
             let initialSymbolTable = ST.populateSymbolTable [] Map.empty
             let finalSymbolTable = SA.analyzeProgram prog initialSymbolTable
             putStrLn "Symbol Table after Semantic Analysis:"
