@@ -1,14 +1,12 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-# OPTIONS_GHC -Wno-overlapping-patterns #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant bracket" #-}
 module GeneratorCode.GeneratorCode(generateProgram) where
 
 import Grammar.Grammar
 import Data.List (intercalate)
 
 generateProgram :: Program -> String
-generateProgram (Program stmts) = unlines (map generateStatement stmts)
+generateProgram (Program stmts) = unlines ("import pandas as pd\n" : map generateStatement stmts)
 
 generateStatement :: Statement -> String
 generateStatement (Assignment _ (Identifier ident) expr) =
@@ -45,20 +43,26 @@ generateStatement (FunctionCall (Identifier name) args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
 
 generateStatement (LoadData filePath (Identifier ident)) =
-    ident ++ " = pd.read_csv(" ++ show filePath ++ ")"
+    ident ++ " = pd.read_csv(" ++ show filePath ++ ")\n"
 
 generateStatement (FilterRows (Identifier ident) cond) =
-    ident ++ " = " ++ ident ++ "[" ++ generateExpression cond ++ "]"
+    ident ++ " = " ++ ident ++ "[" ++ generateExpression cond ++ "]\n"
 
 generateStatement (SaveData (Identifier ident) filePath) =
-    ident ++ ".to_csv(" ++ show filePath ++ ", index=False)"
+    ident ++ ".to_csv(" ++ show filePath ++ ", index=False)\n"
+
+generateStatement (SelectColumns (Identifier ident) cols) =
+    ident ++ " = " ++ ident ++ "[" ++ intercalate ", " (map (\(Identifier col) -> show col) cols) ++ "]\n"
+
+generateStatement (GroupBy (Identifier ident) cols) =
+    ident ++ " = " ++ ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) cols) ++ "])\n"
 
 generateStatement (ApplyFunctions (Identifier ident) (functId, args)) =
     ident ++ " = " ++ ident ++ "." ++ generateFunctionCall (functId, args)
 
 generateStatement (Comment comment) =
     "# " ++ comment
-generateStatement _ = error "Unsupported statement"
+generateStatement _ = ""
 
 
 generateFunctionCall :: FunctionCall -> String
@@ -66,13 +70,15 @@ generateFunctionCall (Identifier name, args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
 
 generateExpression :: Expression -> String
-generateExpression (Term term) = generateTerm(term)
+generateExpression (Term term) = generateTerm term
 generateExpression (BinaryOp op left right) =
-    generateExpression(left) ++ " " ++ generateOperator(op) ++ " " ++ generateExpression(right)
+    generateExpression left ++ " " ++ generateOperator op ++ " " ++ generateExpression right
 generateExpression (FunctCall (Identifier name) args) =
     name ++ "(" ++ intercalate ", " (map generateExpression args) ++ ")"
 generateExpression (Filter (Identifier ident) expr) =
-    ident ++ "[" ++ generateExpression expr ++ "]"
+    ident ++ "[" ++ generateExpression expr ++ "]\n"
+generateExpression (Group (Identifier ident) indetifiers) =
+    ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) indetifiers) ++ "])\n"
 generateExpression _ = error "Unhandled expression"
 
 generateTerm :: Term -> String
