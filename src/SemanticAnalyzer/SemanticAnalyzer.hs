@@ -65,11 +65,18 @@ analyzeStatement stmt symTable =
 
         AST.SaveData ident _ -> validateDataType ident symTable
 
-        AST.ApplyFunctions ident funcCall -> symTable
+        AST.ApplyFunctions ident funcCall ->
+            let symTable' = validateDataType ident symTable
+            in analyzeStatement (uncurry AST.FunctionCall funcCall) symTable'
 
         AST.Comment _ -> symTable
 
-        AST.PatternMatch ident cases -> symTable
+        AST.PatternMatch ident cases ->
+            let name = ST.nameFromIdentifier ident
+                symTable' = case ST.lookupSymbol name symTable of
+                    Just _  -> symTable
+                    Nothing -> error $ "Pattern match on undefined variable: " ++ name
+            in foldl (flip analyzePatternCase) symTable' cases
 
 analyzeExpression :: AST.Expression -> ST.SymbolTable -> ST.SymbolTable
 analyzeExpression expr symTable =
@@ -103,3 +110,25 @@ validateDataType ident symTable =
             then error $ "Variable not of type DATA: " ++ ST.nameFromIdentifier ident
             else symTable
         Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
+
+analyzePatternCase :: AST.PatternCase -> ST.SymbolTable -> ST.SymbolTable
+analyzePatternCase patternCase symTable =
+    case patternCase of
+        AST.PatternCase pattern body ->
+            analyzePattern pattern symTable body
+        AST.OtherwiseCase body ->
+            analyzeStatements body symTable
+
+analyzePattern :: AST.Pattern -> ST.SymbolTable -> [AST.Statement] -> ST.SymbolTable
+analyzePattern pattern symTable body =
+    case pattern of
+        AST.PatNumber num ->
+            let symTable' = case ST.lookupSymbol (show num) symTable of
+                    Just _ -> symTable
+                    Nothing -> error $ "Pattern match on undefined number: " ++ show num
+            in analyzeStatements body symTable'
+        AST.PatString str ->
+            let symTable' = case ST.lookupSymbol str symTable of
+                    Just _ -> symTable
+                    Nothing -> error $ "Pattern match on undefined string: " ++ str
+            in analyzeStatements body symTable'
