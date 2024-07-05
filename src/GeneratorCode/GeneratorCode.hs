@@ -52,7 +52,7 @@ generateStatement (SaveData (Identifier ident) filePath) =
     ident ++ ".to_csv(" ++ show filePath ++ ", index=False)\n"
 
 generateStatement (SelectColumns (Identifier ident) cols) =
-    ident ++ " = " ++ ident ++ "[" ++ intercalate ", " (map (\(Identifier col) -> show col) cols) ++ "]\n"
+    ident ++ " = " ++ ident ++ "[[" ++ intercalate ", " (map (\(Identifier col) -> show col ) cols) ++ "]]\n"
 
 generateStatement (GroupBy (Identifier ident) cols) =
     ident ++ " = " ++ ident ++ ".groupby([" ++ intercalate ", " (map (\(Identifier col) -> show col) cols) ++ "])\n"
