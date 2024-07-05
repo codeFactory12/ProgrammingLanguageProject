@@ -73,10 +73,14 @@ analyzeStatement stmt symTable =
 
         AST.PatternMatch ident cases ->
             let name = ST.nameFromIdentifier ident
-                symTable' = case ST.lookupSymbol name symTable of
-                    Just _  -> symTable
-                    Nothing -> error $ "Pattern match on undefined variable: " ++ name
-            in foldl (flip analyzePatternCase) symTable' cases
+            in case ST.lookupSymbol name symTable of
+                Just symbol ->
+                    let symTable' = analyzePatternCases symbol cases symTable
+                    in symTable'
+                Nothing ->
+                    let sym = ST.Symbol name ST.STRING ST.LOCAL True
+                        symTable' = ST.insertSymbol name sym symTable
+                    in analyzePatternCases sym cases symTable'
 
 analyzeExpression :: AST.Expression -> ST.SymbolTable -> ST.SymbolTable
 analyzeExpression expr symTable =
@@ -111,24 +115,18 @@ validateDataType ident symTable =
             else symTable
         Nothing -> error $ "Variable not in scope: " ++ ST.nameFromIdentifier ident
 
-analyzePatternCase :: AST.PatternCase -> ST.SymbolTable -> ST.SymbolTable
-analyzePatternCase patternCase symTable =
-    case patternCase of
-        AST.PatternCase pattern body ->
-            analyzePattern pattern symTable body
-        AST.OtherwiseCase body ->
-            analyzeStatements body symTable
+analyzePatternCases :: ST.Symbol -> [AST.PatternCase] -> ST.SymbolTable -> ST.SymbolTable
+analyzePatternCases symbol cases symTable = foldl (analyzePatternCase symbol) symTable cases
 
-analyzePattern :: AST.Pattern -> ST.SymbolTable -> [AST.Statement] -> ST.SymbolTable
-analyzePattern pattern symTable body =
+analyzePatternCase :: ST.Symbol -> ST.SymbolTable -> AST.PatternCase -> ST.SymbolTable
+analyzePatternCase symbol symTable (AST.PatternCase pattern stmts) =
+    if validatePattern symbol pattern
+    then analyzeStatements stmts symTable
+    else symTable
+analyzePatternCase _ symTable (AST.OtherwiseCase stmts) = analyzeStatements stmts symTable
+
+validatePattern :: ST.Symbol -> AST.Pattern -> Bool
+validatePattern symbol pattern =
     case pattern of
-        AST.PatNumber num ->
-            let symTable' = case ST.lookupSymbol (show num) symTable of
-                    Just _ -> symTable
-                    Nothing -> error $ "Pattern match on undefined number: " ++ show num
-            in analyzeStatements body symTable'
-        AST.PatString str ->
-            let symTable' = case ST.lookupSymbol str symTable of
-                    Just _ -> symTable
-                    Nothing -> error $ "Pattern match on undefined string: " ++ str
-            in analyzeStatements body symTable'
+        AST.PatNumber _ -> ST.getSymbolType symbol == ST.INTEGER
+        AST.PatString _ -> ST.getSymbolType symbol == ST.STRING
